@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 import streamlit as st
 import docx
 from llm_utils import extract_contract_terms, predict_task_compliance
@@ -6,8 +5,7 @@ import json
 import pandas as pd
 from copy import deepcopy
 
-# load env variables
-load_dotenv()
+# ensure that environment variable OPENAI_API_KEY is set
 
 st.title("Contract Understanding Agent")
 
@@ -24,7 +22,7 @@ def get_contract_terms(uploaded_contract):
 
 @st.cache_data
 def get_task_compliance(uploaded_tasks, json_data):
-    df = pd.read_excel(uploaded_tasks)
+    df = pd.read_excel(uploaded_tasks, index_col=False)
     for i, row in df.iterrows():
         task = row["Task Description"]
         amount = row["Amount"]
@@ -32,7 +30,7 @@ def get_task_compliance(uploaded_tasks, json_data):
 
         # ensure that the output has the required keys
         # (LLM output may not always be consistent)
-        if "compilant" in compliance_prediction:
+        if "compliant" in compliance_prediction:
             df.at[i, "Compliant?"] = compliance_prediction["compliant"]
         else:
             df.at[i, "Compliant?"] = "Unknown"
@@ -51,7 +49,9 @@ def get_task_compliance(uploaded_tasks, json_data):
 
 
 # Extract contract terms from uploaded docx file of the contract
-uploaded_contract = st.file_uploader("Upload your contract")
+uploaded_contract = st.file_uploader(
+    "Upload your contract (only docx format is accepted)"
+)
 if uploaded_contract is not None:
     json_data = get_contract_terms(uploaded_contract)
     json_string = json.dumps(json_data)
@@ -63,7 +63,9 @@ if uploaded_contract is not None:
         data=json_string,
     )
 
-    uploaded_tasks = st.file_uploader("Upload your tasks")
+    uploaded_tasks = st.file_uploader(
+        "Upload your tasks (only xlsx format is accepted)"
+    )
     if uploaded_tasks is not None:
         task_compliance_data = get_task_compliance(uploaded_tasks, json_data)
         # display as HTML so that the list of violated terms is displayed as a neat list
