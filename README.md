@@ -25,6 +25,8 @@ Two components built using LangChain to return structured output in JSON mode vi
 
 ## Public URL of the app hosted on Streamlit Cloud
 
+https://contract-understanding-agent-39m2a7we7c93znddyo6t7h.streamlit.app/
+
 ## How to run the app locally
 
 - Create an env file with the OPENAI_API_KEY set to a valid one (say, `.env`)
